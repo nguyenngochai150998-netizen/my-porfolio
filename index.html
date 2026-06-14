@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="vi" class="lang-vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nguyễn Ngọc Hải — Mobile Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0E0B17;
+    --bg-soft:#15111F;
+    --card:#1C1730;
+    --card-border:#2E2747;
+    --text:#F5F3FF;
+    --muted:#8A84A3;
+    --accent:#A78BFA;
+    --accent-soft:#C4B5FD;
+    --accent-deep:#7C5CFC;
+    --glow: 0 0 80px rgba(167,139,250,0.35);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== Background ambient ===== */
+  .bg-grid{
+    position:fixed; inset:0; z-index:0;
+    background-image:
+      radial-gradient(circle at 80% 10%, rgba(167,139,250,0.12), transparent 45%),
+      radial-gradient(circle at 10% 90%, rgba(124,92,252,0.10), transparent 40%),
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: auto, auto, 56px 56px, 56px 56px;
+    pointer-events:none;
+  }
+
+  /* ===== Nav ===== */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:28px 6vw;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.04em;
+    color:var(--muted);
+    backdrop-filter:blur(8px);
+    mix-blend-mode:normal;
+  }
+  nav .logo{
+    color:var(--text);
+    font-weight:600;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:16px;
+  }
+  nav .logo span{color:var(--accent);}
+  nav ul{
+    display:flex; gap:32px; list-style:none;
+  }
+  nav a{
+    color:var(--muted); text-decoration:none;
+    transition:color .25s ease;
+    position:relative;
+  }
+  nav a:hover, nav a:focus-visible{color:var(--text);}
+  nav a::after{
+    content:'';
+    position:absolute; left:0; bottom:-6px;
+    width:0; height:1px; background:var(--accent);
+    transition:width .25s ease;
+  }
+  nav a:hover::after, nav a:focus-visible::after{width:100%;}
+
+  @media (max-width:780px){
+    nav ul{display:none;}
+  }
+
+  /* ===== Language toggle ===== */
+  .lang-toggle{
+    display:flex;
+    border:1px solid var(--card-border);
+    border-radius:100px;
+    overflow:hidden;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    background:rgba(28,23,48,0.5);
+  }
+  .lang-toggle button{
+    border:none; background:transparent;
+    color:var(--muted);
+    padding:8px 14px;
+    cursor:pointer;
+    font-family:inherit; font-size:inherit;
+    letter-spacing:0.06em;
+    transition:color .25s ease, background .25s ease;
+  }
+  .lang-toggle button.active{
+    color:#1A1330;
+    background:var(--accent-soft);
+  }
+  .lang-toggle button:hover:not(.active){ color:var(--text); }
+
+  /* Hide elements not in active language */
+  html.lang-vi [data-lang="en"]{ display:none !important; }
+  html.lang-en [data-lang="vi"]{ display:none !important; }
+
+  /* ===== Intro overlay ===== */
+  .intro{
+    position:fixed; inset:0; z-index:200;
+    background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    gap:24px;
+    transition:opacity .7s ease, visibility .7s ease;
+  }
+  .intro.hide{
+    opacity:0; visibility:hidden; pointer-events:none;
+  }
+  .intro-mark{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(1.8rem, 6vw, 3rem);
+    letter-spacing:0.02em;
+    color:var(--text);
+    opacity:0;
+    animation: introFade .6s ease forwards .15s;
+  }
+  .intro-mark .accent{ color:var(--accent); }
+  .intro-bar{
+    width:240px; height:2px;
+    background:var(--card-border);
+    border-radius:2px;
+    overflow:hidden;
+    opacity:0;
+    animation: introFade .6s ease forwards .35s;
+  }
+  .intro-bar-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--accent-deep), var(--accent-soft));
+    animation: introLoad 1.4s ease-in-out forwards .5s;
+  }
+  .intro-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    opacity:0;
+    animation: introFade .6s ease forwards .5s;
+  }
+  @keyframes introFade{
+    from{ opacity:0; transform:translateY(8px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes introLoad{
+    from{ width:0%; }
+    to{ width:100%; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .intro{ display:none; }
+  }
+
+  /* ===== Hero ===== */
+  .hero{
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items:center;
+    padding:0 6vw;
+    gap:40px;
+  }
+  @media (max-width:980px){
+    .hero{grid-template-columns:1fr; padding-top:140px; padding-bottom:60px; min-height:auto;}
+  }
+
+  .hero-text .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--accent-soft);
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    display:flex; align-items:center; gap:12px;
+    margin-bottom:22px;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .1s;
+  }
+  .hero-text .eyebrow .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 0 rgba(167,139,250,0.6);
+    animation:pulse 2.4s infinite;
+  }
+
+  .hero-text h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(2.4rem, 6.2vw, 4.8rem);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .2s;
+  }
+  .hero-text h1 .name-accent{
+    color:var(--accent);
+  }
+
+  .hero-text .role{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:900;
+    font-size:clamp(2.6rem, 7vw, 5.4rem);
+    line-height:1;
+    margin-top:6px;
+    letter-spacing:-0.02em;
+    background:linear-gradient(180deg, var(--text) 0%, var(--text) 55%, rgba(245,243,255,0.15) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .35s;
+  }
+  .hero-text .role .stroke{
+    -webkit-text-fill-color:transparent;
+    -webkit-text-stroke: 1.5px var(--accent-soft);
+    color:transparent;
+  }
+
+  .hero-text p.lead{
+    margin-top:26px;
+    max-width:480px;
+    color:var(--muted);
+    font-size:1.02rem;
+    line-height:1.7;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .5s;
+  }
+
+  .hero-cta{
+    margin-top:38px;
+    display:flex; gap:16px; flex-wrap:wrap;
+    opacity:0;
+    animation:fadeUp .8s ease forwards .65s;
+  }
+  .btn{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:0.95rem;
+    padding:15px 30px;
+    border-radius:100px;
+    text-decoration:none;
+    transition:transform .25s ease, box-shadow .25s ease, background .25s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#1A1330;
+    box-shadow:0 0 0 0 rgba(167,139,250,0.5);
+  }
+  .btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 30px -8px rgba(167,139,250,0.65);
+  }
+  .btn-ghost{
+    border:1px solid var(--card-border);
+    color:var(--text);
+    background:transparent;
+  }
+  .btn-ghost:hover{
+    border-color:var(--accent-soft);
+    transform:translateY(-2px);
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(18px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(167,139,250,0.55);}
+    70%{box-shadow:0 0 0 10px rgba(167,139,250,0);}
+    100%{box-shadow:0 0 0 0 rgba(167,139,250,0);}
+  }
+
+  /* ===== 3D Avatar ===== */
+  .avatar-stage{
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    height:560px;
+    perspective:1200px;
+  }
+  @media (max-width:980px){ .avatar-stage{height:420px; margin-top:20px;} }
+  @media (max-width:520px){ .avatar-stage{height:360px;} }
+
+  .avatar-glow{
+    position:absolute;
+    width:380px; height:380px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(167,139,250,0.35), rgba(124,92,252,0.08) 55%, transparent 75%);
+    filter:blur(10px);
+    animation:glowPulse 5s ease-in-out infinite;
+  }
+  @keyframes glowPulse{
+    0%,100%{transform:scale(1); opacity:0.85;}
+    50%{transform:scale(1.08); opacity:1;}
+  }
+
+  .avatar3d{
+    position:relative;
+    width:300px; height:300px;
+    transform-style:preserve-3d;
+    transition:transform .25s ease-out;
+    will-change:transform;
+    animation:floatY 6s ease-in-out infinite;
+  }
+  @keyframes floatY{
+    0%,100%{ translate: 0 0px; }
+    50%{ translate: 0 -16px; }
+  }
+
+  /* Head (sphere via layered circles) */
+  .head{
+    position:absolute; inset:0;
+    border-radius:50%;
+    background:linear-gradient(155deg, #FFD9C2 0%, #F4B79A 55%, #E29C82 100%);
+    box-shadow:
+      inset -28px -28px 60px rgba(120,60,40,0.35),
+      inset 18px 18px 40px rgba(255,255,255,0.35),
+      0 30px 60px -20px rgba(0,0,0,0.6);
+    transform: translateZ(0px);
+  }
+
+  /* Hair */
+  .hair-top{
+    position:absolute;
+    top:-30px; left:50%;
+    width:230px; height:120px;
+    transform:translateX(-50%);
+    background:linear-gradient(155deg, #332B4A 0%, #1B1628 55%, #100C18 100%);
+    border-radius:50% 50% 46% 46% / 70% 70% 30% 30%;
+    box-shadow:
+      inset -16px -12px 30px rgba(0,0,0,0.5),
+      inset 12px 16px 30px rgba(167,139,250,0.18);
+    z-index:3;
+  }
+  .hair-side{
+    position:absolute;
+    width:58px; height:96px;
+    background:linear-gradient(160deg, #332B4A 0%, #100C18 100%);
+    border-radius:40% 60% 50% 50% / 55% 60% 45% 40%;
+    z-index:3;
+    box-shadow: inset -6px 0 14px rgba(0,0,0,0.45);
+  }
+  .hair-side-left{ top:36px; left:-14px; transform:translateZ(-6px) rotate(-8deg); }
+  .hair-side-right{ top:36px; right:-14px; transform:translateZ(-6px) rotate(8deg) scaleX(-1); }
+  .hair-fringe{
+    position:absolute;
+    top:14px; left:50%;
+    width:222px; height:64px;
+    transform:translateX(-50%) translateZ(16px);
+    background:linear-gradient(165deg, #3A3252 0%, #1B1628 60%, #100C18 100%);
+    border-radius:48% 48% 58% 58% / 80% 80% 40% 40%;
+    z-index:4;
+    box-shadow: inset 0 -10px 18px rgba(167,139,250,0.12);
+  }
+  .hair-fringe::before, .hair-fringe::after{
+    content:'';
+    position:absolute; bottom:-6px;
+    width:46px; height:34px;
+    background:inherit;
+    border-radius:50% 50% 60% 40% / 60% 60% 40% 40%;
+  }
+  .hair-fringe::before{ left:18px; transform:rotate(-8deg); }
+  .hair-fringe::after{ right:18px; transform:rotate(8deg) scaleX(-1); }
+
+  /* Ears */
+  .ear{
+    position:absolute; top:128px;
+    width:44px; height:58px;
+    background:linear-gradient(155deg, #FFD9C2 0%, #E29C82 100%);
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: inset -8px -8px 16px rgba(120,60,40,0.3), inset 6px 6px 12px rgba(255,255,255,0.4);
+  }
+  .ear-left{ left:-28px; transform:translateZ(-10px) rotate(-6deg); }
+  .ear-right{ right:-28px; transform:translateZ(-10px) rotate(6deg); }
+
+  /* Eyebrows */
+  .brow{
+    position:absolute; top:118px;
+    width:62px; height:14px;
+    background:#3A2E2A;
+    border-radius:8px;
+    z-index:6;
+  }
+  .brow-left{ left:58px; transform:rotate(-4deg) translateZ(10px); }
+  .brow-right{ right:58px; transform:rotate(4deg) translateZ(10px); }
+
+  /* Eyes */
+  .eye{
+    position:absolute; top:138px;
+    width:46px; height:46px;
+    background:#FFFFFF;
+    border-radius:50%;
+    box-shadow:inset 0 6px 10px rgba(0,0,0,0.08);
+    z-index:6;
+    overflow:hidden;
+  }
+  .eye-left{ left:62px; transform:translateZ(12px); }
+  .eye-right{ right:62px; transform:translateZ(12px); }
+  .pupil{
+    position:absolute; width:20px; height:20px; border-radius:50%;
+    background:#2B2540;
+    top:13px; left:13px;
+    transition:transform .15s ease-out;
+  }
+  .pupil::after{
+    content:'';
+    position:absolute; width:6px; height:6px; border-radius:50%;
+    background:#fff; opacity:.9;
+    top:3px; left:3px;
+  }
+
+  /* Nose */
+  .nose{
+    position:absolute; top:168px; left:50%;
+    width:34px; height:30px;
+    transform:translateX(-50%) translateZ(20px);
+    background:linear-gradient(160deg, #FFD9C2, #E29C82);
+    border-radius:50% 50% 60% 60%;
+    box-shadow: inset -4px -4px 8px rgba(120,60,40,0.3);
+    z-index:5;
+  }
+
+  /* Mouth */
+  .mouth{
+    position:absolute; top:206px; left:50%;
+    width:120px; height:30px;
+    transform:translateX(-50%) translateZ(14px);
+    background:#F5F3FF;
+    border-radius:14px;
+    box-shadow: inset 0 -6px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.25);
+    z-index:5;
+  }
+  .mouth::after{
+    content:'';
+    position:absolute; left:8px; right:8px; top:50%;
+    height:2px; background:rgba(0,0,0,0.18);
+  }
+
+  /* Shoulders */
+  .shoulders{
+    position:absolute; bottom:-100px; left:50%;
+    width:400px; height:160px;
+    transform:translateX(-50%) translateZ(-30px);
+    background:linear-gradient(160deg, #2E2747 0%, #1C1730 100%);
+    border-radius:50% 50% 0 0 / 80% 80% 0 0;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+    z-index:1;
+  }
+
+  /* Floating chips around avatar */
+  .chip{
+    position:absolute;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:8px 14px;
+    border:1px solid var(--card-border);
+    background:rgba(28,23,48,0.7);
+    backdrop-filter:blur(6px);
+    border-radius:100px;
+    color:var(--accent-soft);
+    white-space:nowrap;
+    animation:floatChip 7s ease-in-out infinite;
+  }
+  .chip-1{ top:6%; left:-8%; animation-delay:0s; }
+  .chip-2{ top:62%; right:-12%; animation-delay:1.2s; }
+  .chip-3{ bottom:2%; left:2%; animation-delay:2.4s; }
+  @keyframes floatChip{
+    0%,100%{ transform:translateY(0px); }
+    50%{ transform:translateY(-14px); }
+  }
+  @media (max-width:980px){
+    .chip{display:none;}
+  }
+
+  /* ===== Section shared ===== */
+  section{
+    position:relative; z-index:1;
+    padding:120px 6vw;
+  }
+  .section-head{
+    display:flex; align-items:baseline; gap:18px;
+    margin-bottom:60px;
+  }
+  .section-head .index{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--accent);
+    font-size:14px;
+  }
+  .section-head h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(1.8rem, 4vw, 2.6rem);
+  }
+  .section-head .line{
+    flex:1; height:1px;
+    background:linear-gradient(90deg, var(--card-border), transparent);
+  }
+
+  /* ===== About ===== */
+  .about-grid{
+    display:grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap:60px;
+  }
+  @media (max-width:900px){ .about-grid{grid-template-columns:1fr; gap:36px;} }
+
+  .about-grid p{
+    color:var(--muted);
+    line-height:1.85;
+    font-size:1.02rem;
+    margin-bottom:18px;
+  }
+  .about-grid p strong{ color:var(--text); font-weight:600; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+  }
+  .stat{
+    border:1px solid var(--card-border);
+    border-radius:16px;
+    padding:24px 22px;
+    background:linear-gradient(160deg, rgba(167,139,250,0.06), transparent);
+    transition:transform .3s ease, border-color .3s ease;
+  }
+  .stat:hover{
+    transform:translateY(-4px) rotateX(2deg);
+    border-color:var(--accent-soft);
+  }
+  .stat .num{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:900;
+    font-size:2.4rem;
+    color:var(--accent-soft);
+  }
+  .stat .label{
+    margin-top:6px;
+    font-size:0.88rem;
+    color:var(--muted);
+  }
+
+  /* ===== Skills ===== */
+  .skills-wrap{
+    display:flex; flex-wrap:wrap; gap:14px;
+  }
+  .skill-pill{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    padding:11px 20px;
+    border-radius:100px;
+    border:1px solid var(--card-border);
+    color:var(--text);
+    background:var(--card);
+    transition:all .25s ease;
+    cursor:default;
+  }
+  .skill-pill:hover{
+    border-color:var(--accent);
+    color:var(--accent-soft);
+    transform:translateY(-3px) scale(1.04);
+    box-shadow:0 10px 24px -10px rgba(167,139,250,0.5);
+  }
+  .skill-group{ margin-bottom:32px; }
+  .skill-group h4{
+    font-family:'Space Grotesk', sans-serif;
+    color:var(--muted);
+    font-weight:500;
+    font-size:0.85rem;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    margin-bottom:16px;
+  }
+
+  /* ===== Experience timeline (3D layered cards) ===== */
+  .timeline{
+    display:flex; flex-direction:column; gap:28px;
+  }
+  .exp-card{
+    border:1px solid var(--card-border);
+    border-radius:20px;
+    padding:32px 36px;
+    background:linear-gradient(160deg, rgba(255,255,255,0.025), rgba(255,255,255,0.005));
+    transform-style:preserve-3d;
+    transition:transform .4s cubic-bezier(.2,.8,.2,1), border-color .4s ease, box-shadow .4s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .exp-card::before{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(120deg, transparent 30%, rgba(167,139,250,0.07) 50%, transparent 70%);
+    transform:translateX(-100%);
+    transition:transform .8s ease;
+  }
+  .exp-card:hover::before{ transform:translateX(100%); }
+  .exp-card:hover{
+    transform:translateY(-6px) rotateX(1.5deg) rotateY(-1.5deg);
+    border-color:var(--accent-soft);
+    box-shadow:0 24px 50px -20px rgba(124,92,252,0.35);
+  }
+
+  .exp-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    flex-wrap:wrap; gap:12px;
+    margin-bottom:14px;
+  }
+  .exp-top h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1.35rem;
+  }
+  .exp-top .period{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--accent-soft);
+    border:1px solid var(--card-border);
+    padding:6px 14px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+  .exp-sub{
+    color:var(--muted);
+    font-size:0.92rem;
+    font-style:italic;
+    margin-bottom:16px;
+  }
+  .exp-card ul{
+    list-style:none;
+    display:grid;
+    gap:9px;
+  }
+  .exp-card ul li{
+    color:var(--muted);
+    font-size:0.95rem;
+    line-height:1.6;
+    padding-left:22px;
+    position:relative;
+  }
+  .exp-card ul li::before{
+    content:'';
+    position:absolute; left:0; top:9px;
+    width:8px; height:8px;
+    border-radius:2px;
+    background:var(--accent);
+    transform:rotate(45deg);
+    opacity:.8;
+  }
+  .exp-card .team-size{
+    display:inline-block;
+    margin-top:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--accent-soft);
+  }
+  .exp-card .sub-project{
+    margin-top:20px;
+    padding-top:20px;
+    border-top:1px dashed var(--card-border);
+  }
+  .exp-card .sub-project h4{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1rem;
+    margin-bottom:12px;
+    color:var(--accent-soft);
+  }
+
+  /* ===== Education ===== */
+  .edu-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:24px;
+  }
+  @media (max-width:760px){ .edu-grid{grid-template-columns:1fr;} }
+  .edu-card{
+    border:1px solid var(--card-border);
+    border-radius:18px;
+    padding:30px;
+    background:var(--card);
+    transition:transform .3s ease, border-color .3s ease;
+  }
+  .edu-card:hover{ transform:translateY(-4px); border-color:var(--accent-soft); }
+  .edu-card .period{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; color:var(--accent-soft);
+  }
+  .edu-card h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:1.2rem;
+    margin:8px 0 6px;
+  }
+  .edu-card p{ color:var(--muted); font-size:0.92rem; line-height:1.6; }
+
+  /* ===== Footer / Contact ===== */
+  footer{
+    position:relative; z-index:1;
+    padding:100px 6vw 60px;
+    border-top:1px solid var(--card-border);
+    text-align:center;
+  }
+  footer h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:900;
+    font-size:clamp(2.2rem, 8vw, 5rem);
+    letter-spacing:-0.02em;
+    margin-bottom:24px;
+  }
+  footer h2 .accent{ color:var(--accent); }
+  footer .contact-row{
+    display:flex; justify-content:center; gap:28px; flex-wrap:wrap;
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:50px;
+  }
+  footer .contact-row a{ color:var(--text); text-decoration:none; border-bottom:1px solid var(--card-border); transition:color .25s, border-color .25s; }
+  footer .contact-row a:hover{ color:var(--accent-soft); border-color:var(--accent-soft); }
+  footer .bottom-line{
+    font-size:12.5px; color:var(--muted);
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  /* Reveal on scroll */
+  .reveal{
+    opacity:0; transform:translateY(30px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.in{
+    opacity:1; transform:translateY(0);
+  }
+
+  /* Focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--accent-soft);
+    outline-offset:3px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="intro" id="intro">
+  <div class="intro-mark">Ngọc Hải<span class="accent">.dev</span></div>
+  <div class="intro-bar"><div class="intro-bar-fill"></div></div>
+  <div class="intro-status">
+    <span data-lang="vi">Đang khởi tạo giao diện…</span>
+    <span data-lang="en">Initializing interface…</span>
+  </div>
+</div>
+
+<div class="bg-grid"></div>
+
+<nav>
+  <div class="logo">Ngọc Hải<span>.</span></div>
+  <ul>
+    <li><a href="#about"><span data-lang="vi">Giới thiệu</span><span data-lang="en">About</span></a></li>
+    <li><a href="#skills"><span data-lang="vi">Kỹ năng</span><span data-lang="en">Skills</span></a></li>
+    <li><a href="#experience"><span data-lang="vi">Kinh nghiệm</span><span data-lang="en">Experience</span></a></li>
+    <li><a href="#education"><span data-lang="vi">Học vấn</span><span data-lang="en">Education</span></a></li>
+    <li><a href="#contact"><span data-lang="vi">Liên hệ</span><span data-lang="en">Contact</span></a></li>
+  </ul>
+  <div class="lang-toggle" role="group" aria-label="Language switch">
+    <button type="button" id="btn-vi" class="active">VI</button>
+    <button type="button" id="btn-en">EN</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-text">
+    <div class="eyebrow"><span class="dot"></span>
+      <span data-lang="vi">Sẵn sàng cho dự án mới · Hà Nội, Việt Nam</span>
+      <span data-lang="en">Available for new projects · Ha Noi, Vietnam</span>
+    </div>
+    <h1>Nguyễn <span class="name-accent">Ngọc Hải</span></h1>
+    <div class="role">Mobile<br><span class="stroke">Developer</span></div>
+    <p class="lead">
+      <span data-lang="vi">5 năm kinh nghiệm phát triển ứng dụng di động với React Native, chuyên sâu trong lĩnh vực Blockchain, Fintech và Banking. Sub-Team Lead cho dự án quốc tế, thành thạo TypeScript, Redux, Expo SDK và tích hợp native module.</span>
+      <span data-lang="en">5 years of mobile app development experience with React Native, specializing in Blockchain, Fintech and Banking. Sub-Team Lead on an international client project, proficient in TypeScript, Redux, Expo SDK and native module integration.</span>
+    </p>
+    <div class="hero-cta">
+      <a href="#experience" class="btn btn-primary">
+        <span data-lang="vi">Xem dự án</span><span data-lang="en">View projects</span>
+      </a>
+      <a href="#contact" class="btn btn-ghost">
+        <span data-lang="vi">Liên hệ ngay</span><span data-lang="en">Get in touch</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="avatar-stage">
+    <div class="avatar-glow"></div>
+    <div class="chip chip-1">React Native</div>
+    <div class="chip chip-2">TypeScript</div>
+    <div class="chip chip-3">Blockchain</div>
+    <div class="avatar3d" id="avatar3d">
+      <div class="shoulders"></div>
+      <div class="ear ear-left"></div>
+      <div class="ear ear-right"></div>
+      <div class="head"></div>
+      <div class="hair-side hair-side-left"></div>
+      <div class="hair-side hair-side-right"></div>
+      <div class="hair-top"></div>
+      <div class="hair-fringe"></div>
+      <div class="brow brow-left"></div>
+      <div class="brow brow-right"></div>
+      <div class="eye eye-left"><div class="pupil" data-pupil></div></div>
+      <div class="eye eye-right"><div class="pupil" data-pupil></div></div>
+      <div class="nose"></div>
+      <div class="mouth"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-head reveal">
+    <span class="index">01</span>
+    <h2><span data-lang="vi">Giới thiệu</span><span data-lang="en">About</span></h2>
+    <span class="line"></span>
+  </div>
+  <div class="about-grid">
+    <div class="reveal">
+      <p data-lang="vi">Tôi là <strong>Mobile Developer</strong> với hơn <strong>5 năm kinh nghiệm</strong> trong phát triển phần mềm, tập trung vào <strong>React Native</strong>. Tôi đã tham gia các dự án trong lĩnh vực <strong>Blockchain, Fintech và Banking</strong>, đảm nhiệm vai trò Sub-Team Lead cho một dự án có đối tác quốc tế.</p>
+      <p data-lang="vi">Mục tiêu ngắn hạn của tôi là nâng cao kỹ năng với <strong>React Native và Flutter</strong>, đồng thời học thêm <strong>Swift và Kotlin</strong>. Về dài hạn, tôi hướng đến trở thành một <strong>Full-stack JavaScript Developer</strong> thành thạo toàn diện các nền tảng di động.</p>
+      <p data-lang="en">I'm a <strong>Mobile Developer</strong> with over <strong>5 years of experience</strong> in software development, focused on <strong>React Native</strong>. I've worked on projects across <strong>Blockchain, Fintech and Banking</strong>, including a Sub-Team Lead role on an international client project.</p>
+      <p data-lang="en">My short-term goal is to deepen my skills in <strong>React Native and Flutter</strong>, while learning <strong>Swift and Kotlin</strong>. Long-term, I aim to become a <strong>Full-stack JavaScript Developer</strong> with full mastery across mobile platforms.</p>
+    </div>
+    <div class="stat-grid reveal">
+      <div class="stat">
+        <div class="num">5+</div>
+        <div class="label">
+          <span data-lang="vi">Năm kinh nghiệm phát triển phần mềm</span>
+          <span data-lang="en">Years of software development experience</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="num">4</div>
+        <div class="label">
+          <span data-lang="vi">Năm chuyên sâu React Native</span>
+          <span data-lang="en">Years specializing in React Native</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="num">8+</div>
+        <div class="label">
+          <span data-lang="vi">Dự án thực tế đã triển khai</span>
+          <span data-lang="en">Real-world projects delivered</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="num">30</div>
+        <div class="label">
+          <span data-lang="vi">Thành viên — quy mô team lớn nhất</span>
+          <span data-lang="en">Members — largest team size</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-head reveal">
+    <span class="index">02</span>
+    <h2><span data-lang="vi">Kỹ năng &amp; Công nghệ</span><span data-lang="en">Skills &amp; Technologies</span></h2>
+    <span class="line"></span>
+  </div>
+
+  <div class="reveal">
+    <div class="skill-group">
+      <h4>Mobile</h4>
+      <div class="skills-wrap">
+        <span class="skill-pill">React Native</span>
+        <span class="skill-pill">TypeScript</span>
+        <span class="skill-pill">React Hooks</span>
+        <span class="skill-pill">Redux / Redux Toolkit</span>
+        <span class="skill-pill">Context API</span>
+        <span class="skill-pill">Expo SDK</span>
+        <span class="skill-pill">Reanimated</span>
+        <span class="skill-pill">FlashList</span>
+        <span class="skill-pill">MMKV</span>
+        <span class="skill-pill">Fastlane</span>
+        <span class="skill-pill">Native Modules</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h4>Front-end</h4>
+      <div class="skills-wrap">
+        <span class="skill-pill">HTML / CSS</span>
+        <span class="skill-pill">JavaScript</span>
+        <span class="skill-pill">ReactJS</span>
+        <span class="skill-pill">VueJS / VueX</span>
+        <span class="skill-pill">Bootstrap 4</span>
+        <span class="skill-pill">jQuery</span>
+      </div>
+    </div>
+
+    <div class="skill-group">
+      <h4><span data-lang="vi">Back-end &amp; Công cụ</span><span data-lang="en">Back-end &amp; Tools</span></h4>
+      <div class="skills-wrap">
+        <span class="skill-pill">PHP / Laravel</span>
+        <span class="skill-pill">RESTful API</span>
+        <span class="skill-pill">Firebase</span>
+        <span class="skill-pill">Git / GitLab</span>
+        <span class="skill-pill">Figma</span>
+        <span class="skill-pill">Postman</span>
+        <span class="skill-pill">Linux</span>
+        <span class="skill-pill">Docker</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-head reveal">
+    <span class="index">03</span>
+    <h2>Kinh nghiệm làm việc</h2>
+    <span class="line"></span>
+  </div>
+
+  <div class="timeline">
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Blockchain Apps — Zeroone</h3>
+        <span class="period">4/2025 — Hiện tại</span>
+      </div>
+      <div class="exp-sub">Blockchain-based NFT social media app (Sotatek)</div>
+      <ul>
+        <li>Tham gia lập kế hoạch và ước lượng (planning &amp; estimation)</li>
+        <li>Trực tiếp làm việc với khách hàng để thu thập và tinh chỉnh yêu cầu</li>
+        <li>Phát triển và tối ưu tính năng ứng dụng về hiệu suất và khả năng mở rộng</li>
+        <li>Triển khai đăng nhập/đăng ký xã hội (social authentication)</li>
+        <li>Xây dựng tính năng tạo và quản lý wallet cho người dùng mới</li>
+        <li>Phát triển luồng deposit và giao dịch NFT (mua/bán)</li>
+        <li>Xây dựng hệ thống feed với tương tác người dùng (collect, comment, reaction)</li>
+        <li>Cấu hình và quản lý nhiều build environment (dev / staging / production)</li>
+      </ul>
+      <span class="team-size">Team size: 10 members</span>
+
+      <div class="sub-project">
+        <h4>Dự án con: MetaMask-like Crypto Wallet — Matrix One</h4>
+        <ul>
+          <li>Triển khai tính năng tạo và quản lý wallet</li>
+          <li>Xây dựng hỗ trợ multi-chain với chuyển đổi network liền mạch</li>
+          <li>Quản lý cấu hình blockchain network trong app</li>
+          <li>Phát triển màn hình chi tiết tài sản cho token và NFT</li>
+          <li>Tích hợp dApp access (Web3 browser, deep linking)</li>
+          <li>Triển khai tính năng chuyển tiền đến các địa chỉ wallet khác</li>
+        </ul>
+        <span class="team-size">Team size: 30 members</span>
+      </div>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Biz Banking App — MB Bank &amp; LP Bank</h3>
+        <span class="period">6/2024 — 4/2025</span>
+      </div>
+      <div class="exp-sub">Alphaway Technology Company · Mobile Developer (React Native)</div>
+      <ul>
+        <li>Tham gia planning, estimation, phát triển và tối ưu tính năng hiệu suất</li>
+        <li>Build và bàn giao bản release cho team testing</li>
+        <li>Tính năng thanh toán hóa đơn: điện, nước, VETC, di động trả trước/sau</li>
+        <li>Tính năng chữ ký số (digital signature)</li>
+        <li>Tính năng xem sao kê (statement) theo ngày</li>
+        <li>Tính năng LC (Letter of Credit), LD (Loan Disbursement), MD (Money Deposit)</li>
+        <li>Quét và tạo mã QR code</li>
+        <li>Cấu hình ProGuard để chống decompile</li>
+        <li>Tạo và phê duyệt giao dịch chuyển tiền (nội bộ, ngoài hệ thống, lương, giải ngân...)</li>
+        <li>Chuyển đổi từ AsyncStorage sang MMKV</li>
+        <li>Triển khai native module, kết nối React Native SDK</li>
+      </ul>
+      <span class="team-size">Team size: 10 members</span>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Fintech App — US &amp; Singapore Market</h3>
+        <span class="period">12/2022 — 6/2024</span>
+      </div>
+      <div class="exp-sub">Equix Technologies Company · Ứng dụng giao dịch & quản lý tài chính</div>
+      <ul>
+        <li>Công nghệ: React Native 0.73, TypeScript, Redux Toolkit, Realtime SSE, Reanimated, Fastlane, Firebase, MMKV, FlashList, React Hook Form</li>
+        <li>Tham gia planning, estimation, phân tích yêu cầu khách hàng, code review, maintain app</li>
+        <li>Đồng bộ config từ file env với Back-end, tương tự Firebase remote config</li>
+        <li>Chuyển đổi thiết kế Figma thành ứng dụng</li>
+        <li>Tạo nhiều flavor phù hợp môi trường dev/uat/product</li>
+        <li>Đăng nhập qua WebView SSO và Biometrics</li>
+        <li>Tính năng Order: thực hiện giao dịch mua/bán cổ phiếu</li>
+        <li>Watchlist: vuốt để xóa, sửa và sắp xếp vị trí</li>
+        <li>Symbol Detail: thông tin chi tiết mã cổ phiếu</li>
+        <li>Xem và lưu file PDF trong ứng dụng</li>
+        <li>Webinar: xem video YouTube trong app qua YouTube API</li>
+        <li>Push Notification qua Firebase Cloud Messaging và Notifee</li>
+        <li>Build &amp; deploy tự động lên TestFlight bằng Fastlane</li>
+      </ul>
+      <span class="team-size">Team size: 13 members</span>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Quản lý trạm sạc xe điện</h3>
+        <span class="period">5/2022 — 11/2022</span>
+      </div>
+      <div class="exp-sub">DEHA Việt Nam · Tính phí và đặt lịch sạc xe điện</div>
+      <ul>
+        <li>Công nghệ: Mobile (React Native, TypeScript, Redux Toolkit), Website (ReactJS, TypeScript, Redux Toolkit)</li>
+        <li>App: đăng nhập, đăng ký, push notification (Firebase Cloud Messaging), Google Map, quét QR code</li>
+        <li>Xây dựng UI từ thiết kế, load dữ liệu từ MySQL</li>
+        <li>Website Admin: CRUD bằng ReactJS</li>
+      </ul>
+      <span class="team-size">Team size: 8 members</span>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Dating App</h3>
+        <span class="period">6/2021 — 12/2021</span>
+      </div>
+      <div class="exp-sub">DEHA Việt Nam · Tìm kiếm, ghép cặp, chat</div>
+      <ul>
+        <li>Công nghệ: React Native, Redux</li>
+        <li>Lấy vị trí người dùng để tìm kiếm và ghép cặp xung quanh</li>
+        <li>Màn hình chat cho các cặp đôi trao đổi thông tin</li>
+        <li>Xây dựng UI từ thiết kế, load dữ liệu từ MySQL</li>
+      </ul>
+      <span class="team-size">Team size: 5 members</span>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Quản lý vận chuyển</h3>
+        <span class="period">6/2021 — 12/2021</span>
+      </div>
+      <div class="exp-sub">DEHA Việt Nam · Quản lý đơn hàng và thông tin giao hàng</div>
+      <ul>
+        <li>Công nghệ: React Native, Redux, quản lý source code bằng GitLab</li>
+        <li>CRUD thông tin đơn hàng, lịch sử vận chuyển</li>
+        <li>Xây dựng UI từ thiết kế, load dữ liệu từ MySQL</li>
+      </ul>
+      <span class="team-size">Team size: 6 members</span>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Web quản lý chất lượng tàu</h3>
+        <span class="period">4/2021 — 6/2021</span>
+      </div>
+      <div class="exp-sub">DEHA Việt Nam · Tra cứu trạng thái, lưu thông tin & báo cáo</div>
+      <ul>
+        <li>Front-end: VueJS, VueX · Back-end: PHP, Laravel</li>
+        <li>Viết RESTful API cho Front-end</li>
+        <li>Xây dựng UI bằng VueJS, load dữ liệu qua API</li>
+        <li>CRUD thông tin tàu và các mục cần kiểm tra</li>
+      </ul>
+      <span class="team-size">Team size: 10 members</span>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Web quản lý dịch vụ du lịch</h3>
+        <span class="period">12/2021 — 3/2022</span>
+      </div>
+      <div class="exp-sub">DEHA Việt Nam · Quản lý khách sạn, doanh thu & báo cáo</div>
+      <ul>
+        <li>Front-end: HTML, CSS, JavaScript, jQuery, Bootstrap 4 · Back-end: PHP, Laravel</li>
+        <li>Viết RESTful API, xây dựng UI và load dữ liệu qua API</li>
+        <li>CRUD hợp đồng, sản phẩm, in hóa đơn</li>
+      </ul>
+      <span class="team-size">Team size: 10 members</span>
+    </article>
+
+    <article class="exp-card reveal">
+      <div class="exp-top">
+        <h3>Web quản lý sức khỏe bệnh nhân</h3>
+        <span class="period">4/2021 — 6/2021</span>
+      </div>
+      <div class="exp-sub">DEHA Việt Nam · Chat, quản lý thông tin bệnh nhân & đơn thuốc</div>
+      <ul>
+        <li>Front-end: HTML, CSS, JavaScript, jQuery, Bootstrap 4 · Back-end: PHP, Laravel</li>
+        <li>Viết RESTful API</li>
+        <li>CRUD thông tin người dùng, hồ sơ sức khỏe, đơn thuốc</li>
+      </ul>
+      <span class="team-size">Team size: 12 members</span>
+    </article>
+
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-head reveal">
+    <span class="index">04</span>
+    <h2>Học vấn & Chứng chỉ</h2>
+    <span class="line"></span>
+  </div>
+  <div class="edu-grid reveal">
+    <div class="edu-card">
+      <span class="period">2016 — 2020</span>
+      <h3>Đại học Quảng Bình</h3>
+      <p>Cử nhân Luật — Tốt nghiệp ngành Luật.</p>
+    </div>
+    <div class="edu-card">
+      <span class="period">2020 — 2021</span>
+      <h3>Deha Academy</h3>
+      <p>Back-end Intern (Laravel) — Đào tạo Linux, Git, RESTful API, Docker, Laravel.</p>
+    </div>
+    <div class="edu-card">
+      <span class="period">2021</span>
+      <h3>JavaScript — W3Schools</h3>
+      <p>Chứng chỉ hoàn thành khóa học JavaScript.</p>
+    </div>
+    <div class="edu-card">
+      <span class="period">2020</span>
+      <h3>JavaScript & Responsive Web Design — FreeCodeCamp</h3>
+      <p>Hai chứng chỉ: JavaScript cơ bản và Responsive Web Design.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<footer id="contact">
+  <h2 class="reveal">Cùng xây dựng <span class="accent">điều gì đó</span> tuyệt vời?</h2>
+  <div class="contact-row reveal">
+    <a href="mailto:nguyenngochai006@gmail.com">nguyenngochai006@gmail.com</a>
+    <a href="tel:0876051719">0876 051 719</a>
+    <a href="https://www.linkedin.com/in/hainguyenngoc/" target="_blank" rel="noopener">LinkedIn</a>
+    <span>Hà Nội, Việt Nam</span>
+  </div>
+  <div class="bottom-line">© 2026 Nguyễn Ngọc Hải — Mobile Developer Portfolio</div>
+</footer>
+
+<script>
+  // =========================
+  // INTRO LOADING (2s)
+  // =========================
+  const pageStartTime = Date.now();
+
+  window.addEventListener('load', () => {
+    const intro = document.getElementById('intro');
+
+    const elapsed = Date.now() - pageStartTime;
+    const remaining = Math.max(0, 2000 - elapsed);
+
+    setTimeout(() => {
+      intro.classList.add('hide');
+
+      setTimeout(() => {
+        intro.remove();
+      }, 700);
+    }, remaining);
+  });
+
+  // =========================
+  // LANGUAGE SWITCHER
+  // =========================
+  const html = document.documentElement;
+
+  const btnVi = document.getElementById('btn-vi');
+  const btnEn = document.getElementById('btn-en');
+
+  function setLanguage(lang) {
+    if (lang === 'en') {
+      html.classList.remove('lang-vi');
+      html.classList.add('lang-en');
+
+      btnEn.classList.add('active');
+      btnVi.classList.remove('active');
+    } else {
+      html.classList.remove('lang-en');
+      html.classList.add('lang-vi');
+
+      btnVi.classList.add('active');
+      btnEn.classList.remove('active');
+    }
+
+    localStorage.setItem('portfolio-language', lang);
+  }
+
+  const savedLanguage =
+    localStorage.getItem('portfolio-language') || 'vi';
+
+  setLanguage(savedLanguage);
+
+  btnVi.addEventListener('click', () => {
+    setLanguage('vi');
+  });
+
+  btnEn.addEventListener('click', () => {
+    setLanguage('en');
+  });
+
+  // =========================
+  // AVATAR 3D
+  // =========================
+  const stage = document.querySelector('.avatar-stage');
+  const avatar = document.getElementById('avatar3d');
+  const pupils = document.querySelectorAll('[data-pupil]');
+
+  if (
+    stage &&
+    avatar &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    window.addEventListener('mousemove', (e) => {
+      const rect = stage.getBoundingClientRect();
+
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+
+      const clampedX = Math.max(-1, Math.min(1, dx));
+      const clampedY = Math.max(-1, Math.min(1, dy));
+
+      avatar.style.transform =
+        `rotateY(${clampedX * 18}deg) rotateX(${-clampedY * 14}deg)`;
+
+      pupils.forEach((p) => {
+        p.style.transform =
+          `translate(${clampedX * 6}px, ${clampedY * 6}px)`;
+      });
+    });
+  }
+
+  // =========================
+  // SCROLL REVEAL
+  // =========================
+  const revealEls = document.querySelectorAll('.reveal');
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.15
+    }
+  );
+
+  revealEls.forEach((el) => observer.observe(el));
+</script>
+
+</body>
+</html>
