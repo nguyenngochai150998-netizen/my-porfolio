@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ngọc Hải.dev — React Native Deep Dive</title>
+<style>
+  :root{
+    --bg:#0b0d12;
+    --bg-soft:#11141b;
+    --panel:#151922;
+    --panel-border:#232936;
+    --text:#e6e9ef;
+    --text-dim:#8b94a7;
+    --accent:#7ef0c2;
+    --accent-soft:rgba(126,240,194,0.12);
+    --accent-2:#7aa2ff;
+    --warn:#ffb86b;
+    --danger:#ff7a93;
+    --mono: "JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans: "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* background grid texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(126,240,194,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(126,240,194,0.035) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events:none;
+    z-index:0;
+    mask-image: radial-gradient(circle at 50% 0%, rgba(0,0,0,0.9), transparent 75%);
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:0 24px; }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:20;
+    background:rgba(11,13,18,0.75);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--panel-border);
+  }
+  nav .inner{
+    max-width:1080px; margin:0 auto; padding:16px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    font-family:var(--mono); font-size:14px; font-weight:600; color:var(--text);
+    display:flex; align-items:center; gap:8px;
+    text-decoration:none;
+  }
+  .brand .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+  .brand .dim{ color:var(--text-dim); }
+  nav .back{
+    font-family:var(--mono); font-size:13px; color:var(--text-dim);
+    text-decoration:none; border:1px solid var(--panel-border); border-radius:999px;
+    padding:8px 16px; transition: all .2s ease;
+    display:flex; align-items:center; gap:8px;
+  }
+  nav .back:hover{ color:var(--accent); border-color:var(--accent); background:var(--accent-soft); }
+
+  /* ---------- HERO ---------- */
+  header.hero{ padding:88px 0 56px; }
+  .eyebrow{
+    font-family:var(--mono); font-size:13px; color:var(--accent);
+    letter-spacing:0.08em; text-transform:uppercase;
+    display:flex; align-items:center; gap:10px; margin-bottom:20px;
+  }
+  .eyebrow::before{
+    content:""; display:inline-block; width:24px; height:1px; background:var(--accent);
+  }
+  h1.title{
+    font-family:var(--mono); font-weight:700;
+    font-size:clamp(32px,5vw,52px);
+    line-height:1.15; letter-spacing:-0.01em;
+    margin-bottom:18px;
+  }
+  h1.title .grad{
+    background:linear-gradient(120deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p.lead{
+    color:var(--text-dim); font-size:17px; max-width:680px; margin-bottom:28px;
+  }
+  .hero p.lead strong{ color:var(--text); font-weight:600; }
+
+  .pill-row{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:36px; }
+  .pill{
+    font-family:var(--mono); font-size:12.5px; padding:7px 14px; border-radius:999px;
+    border:1px solid var(--panel-border); color:var(--text-dim); background:var(--panel);
+  }
+  .pill.on{ color:var(--accent); border-color:rgba(126,240,194,0.35); background:var(--accent-soft); }
+
+  .stat-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    border:1px solid var(--panel-border); border-radius:14px; overflow:hidden;
+    background:var(--panel-border);
+  }
+  .stat{ background:var(--panel); padding:22px 20px; }
+  .stat .num{ font-family:var(--mono); font-size:28px; font-weight:700; color:var(--accent); }
+  .stat .label{ font-size:12.5px; color:var(--text-dim); margin-top:4px; }
+
+  @media (max-width:680px){
+    .stat-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  section{ padding:64px 0; border-top:1px solid var(--panel-border); }
+  .section-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:36px; flex-wrap:wrap; }
+  .section-num{ font-family:var(--mono); font-size:14px; color:var(--accent); }
+  .section-head h2{ font-family:var(--mono); font-size:clamp(22px,3vw,30px); font-weight:700; }
+  .section-sub{ color:var(--text-dim); font-size:15px; max-width:640px; margin:-20px 0 36px; }
+
+  /* ---------- TOPIC CARD GRID ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  @media (max-width:760px){ .grid{ grid-template-columns:1fr; } }
+
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:14px;
+    padding:22px 24px; transition: border-color .2s ease, transform .2s ease;
+  }
+  .card:hover{ border-color:rgba(126,240,194,0.35); transform:translateY(-2px); }
+  .card h3{
+    font-family:var(--mono); font-size:16px; font-weight:600; margin-bottom:10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .card h3 .tag{
+    font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+    padding:3px 9px; border-radius:6px; font-family:var(--sans);
+  }
+  .tag.perf{ background:rgba(126,240,194,0.12); color:var(--accent); }
+  .tag.sec{ background:rgba(255,122,147,0.12); color:var(--danger); }
+  .tag.core{ background:rgba(122,162,255,0.12); color:var(--accent-2); }
+  .tag.arch{ background:rgba(255,184,107,0.12); color:var(--warn); }
+
+  .card p, .card ul{ color:var(--text-dim); font-size:14.5px; }
+  .card ul{ margin-top:10px; padding-left:20px; display:flex; flex-direction:column; gap:6px; }
+  .card code{
+    font-family:var(--mono); font-size:12.5px; background:var(--bg-soft);
+    border:1px solid var(--panel-border); border-radius:5px; padding:1px 6px; color:var(--accent);
+  }
+
+  /* ---------- TIMELINE / PROJECTS ---------- */
+  .timeline{ display:flex; flex-direction:column; gap:0; }
+  .tl-item{
+    display:grid; grid-template-columns:160px 1fr; gap:28px;
+    padding:28px 0; border-bottom:1px solid var(--panel-border);
+  }
+  .tl-item:last-child{ border-bottom:none; }
+  .tl-date{ font-family:var(--mono); font-size:13px; color:var(--text-dim); padding-top:2px; }
+  .tl-content h3{ font-family:var(--mono); font-size:17px; margin-bottom:6px; }
+  .tl-content .role{ color:var(--accent); font-size:13.5px; margin-bottom:10px; font-family:var(--mono); }
+  .tl-content p{ color:var(--text-dim); font-size:14.5px; margin-bottom:10px; }
+  .tl-content .stack{ display:flex; flex-wrap:wrap; gap:8px; }
+  .stack-chip{
+    font-family:var(--mono); font-size:11.5px; color:var(--text-dim);
+    border:1px solid var(--panel-border); border-radius:6px; padding:3px 8px;
+  }
+  @media (max-width:680px){
+    .tl-item{ grid-template-columns:1fr; gap:8px; }
+  }
+
+  /* ---------- CODE PANEL ---------- */
+  .code-panel{
+    background:var(--bg-soft); border:1px solid var(--panel-border); border-radius:12px;
+    overflow:hidden; margin-top:14px;
+  }
+  .code-panel .head{
+    display:flex; align-items:center; gap:8px; padding:10px 16px;
+    border-bottom:1px solid var(--panel-border); font-family:var(--mono); font-size:12px; color:var(--text-dim);
+  }
+  .code-panel .head span{ width:9px; height:9px; border-radius:50%; background:var(--panel-border); }
+  .code-panel pre{
+    padding:16px; overflow-x:auto; font-family:var(--mono); font-size:12.5px; line-height:1.7;
+    color:#c5cbe0;
+  }
+  .code-panel pre .c1{ color:var(--text-dim); }
+  .code-panel pre .c2{ color:var(--accent); }
+  .code-panel pre .c3{ color:var(--accent-2); }
+  .code-panel pre .c4{ color:var(--warn); }
+
+  /* ---------- COMPARISON TABLE ---------- */
+  table.cmp{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  table.cmp th, table.cmp td{
+    text-align:left; padding:12px 14px; border-bottom:1px solid var(--panel-border);
+  }
+  table.cmp th{
+    font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:.05em;
+  }
+  table.cmp td{ color:var(--text-dim); }
+  table.cmp td code{ font-family:var(--mono); color:var(--accent-2); }
+  .table-wrap{ overflow-x:auto; border:1px solid var(--panel-border); border-radius:12px; }
+  .table-wrap table{ min-width:560px; }
+
+  /* ---------- FOOTER CTA ---------- */
+  footer{
+    padding:64px 0 80px; text-align:center;
+  }
+  footer h2{ font-family:var(--mono); font-size:clamp(22px,3.5vw,32px); margin-bottom:14px; }
+  footer p{ color:var(--text-dim); margin-bottom:28px; max-width:520px; margin-left:auto; margin-right:auto; }
+  .btn{
+    font-family:var(--mono); font-size:15px; font-weight:700;
+    display:inline-flex; align-items:center; gap:10px;
+    padding:15px 32px; border-radius:10px; text-decoration:none;
+    background:linear-gradient(120deg, var(--warn), var(--accent-2));
+    color:#0b0d12;
+    box-shadow:0 4px 20px rgba(255,184,107,0.18);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 10px 28px rgba(255,184,107,0.3); filter:brightness(1.06); }
+  .btn .en{ color:rgba(11,13,18,0.6); font-weight:600; }
+  .copyright{ margin-top:48px; font-size:12.5px; color:var(--text-dim); font-family:var(--mono); }
+
+  /* scroll reveal */
+  .reveal{ opacity:0; transform:translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="#" class="brand"><span class="dot"></span>Ngọc Hải<span class="dim">.dev / react-native</span></a>
+    <a href="https://nguyenngochai150998-netizen.github.io/my-porfolio/" class="back">← Về Portfolio</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Technical Deep Dive · React Native</div>
+    <h1 class="title">Performance, <span class="grad">Security</span> &amp; Architecture<br>trong các dự án thực tế</h1>
+    <p class="lead">
+      Tổng hợp những kỹ năng <strong>chuyên sâu</strong> tôi áp dụng xuyên suốt các dự án Fintech, Banking và Blockchain —
+      từ tối ưu hiệu suất render, bảo mật dữ liệu &amp; giao tiếp mạng, đến tư duy kiến trúc theo nguyên tắc SOLID.
+      Đây là bản "behind-the-scenes" cho phần Skills &amp; Experience trong portfolio chính.
+    </p>
+
+    <div class="pill-row">
+      <span class="pill on">React Native</span>
+      <span class="pill on">TypeScript</span>
+      <span class="pill">Redux Toolkit</span>
+      <span class="pill">FlashList</span>
+      <span class="pill">Reanimated</span>
+      <span class="pill">MMKV</span>
+      <span class="pill">Native Modules</span>
+      <span class="pill">SSL Pinning</span>
+      <span class="pill">JWT / RSA / AES</span>
+      <span class="pill">ProGuard / R8</span>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="num">5+</div><div class="label">năm phát triển phần mềm</div></div>
+      <div class="stat"><div class="num">2</div><div class="label">mảng chuyên sâu: Performance &amp; Security</div></div>
+      <div class="stat"><div class="num">3</div><div class="label">domain: Fintech, Banking, Blockchain</div></div>
+      <div class="stat"><div class="num">10+</div><div class="label">kỹ thuật tối ưu render &amp; bảo mật</div></div>
+    </div>
+  </header>
+
+  <!-- 01 PERFORMANCE -->
+  <section id="performance">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Optimization Performance — React Native</h2>
+    </div>
+    <p class="section-sub">
+      Triết lý cốt lõi: <strong style="color:var(--text)">càng ít re-render, càng mượt</strong>. Mọi kỹ thuật dưới đây đều phục vụ một mục tiêu —
+      giữ JS Thread rảnh và UI Thread không bị nghẽn.
+    </p>
+
+    <div class="grid">
+      <div class="card reveal">
+        <h3><span class="tag perf">Memoization</span> useCallback / useMemo / React.memo</h3>
+        <p>Tránh re-render thừa bằng shallow comparison, kết hợp tách nhỏ component và custom comparison function cho các props phức tạp.</p>
+        <div class="code-panel">
+          <div class="head"><span></span><span></span><span></span> Counter.tsx</div>
+          <pre><span class="c1">// chỉ re-render khi count thay đổi</span>
+<span class="c3">const</span> Counter = React.memo(({ count, user }) =&gt; {
+  <span class="c1">// ...</span>
+}, (prev, next) =&gt; prev.count === next.count);</pre>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag perf">List Rendering</span> FlatList &amp; FlashList</h3>
+        <p>Tận dụng virtualization — chỉ render phần tử trong viewport + buffer.</p>
+        <ul>
+          <li><code>initialNumToRender</code>, <code>maxToRenderPerBatch</code>, <code>windowSize</code> để kiểm soát batch render</li>
+          <li><code>getItemLayout</code> giúp tránh đo lại kích thước item</li>
+          <li>FlashList dùng <code>estimatedItemSize</code> sát giá trị thật để tối ưu lần render đầu</li>
+        </ul>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag perf">Threading</span> Animated &amp; UI Thread</h3>
+        <p>Dùng <code>Animated</code> với <code>useNativeDriver: true</code> để animation chạy trực tiếp trên UI Thread, không phụ thuộc JS Thread — tránh giật lag khi JS bận.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag perf">Async</span> InteractionManager &amp; Lazy Load</h3>
+        <p>Trì hoãn các tác vụ nặng đến khi UI mượt xong, kết hợp <code>Suspense</code> để lazy-load màn hình.</p>
+        <div class="code-panel">
+          <div class="head"><span></span><span></span><span></span> deferred-task.ts</div>
+          <pre><span class="c3">InteractionManager</span>.runAfterInteractions(() =&gt; {
+  <span class="c1">// chạy sau khi UI mượt, không chặn interaction</span>
+});</pre>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag perf">Assets</span> Resize ảnh &amp; định dạng tối ưu</h3>
+        <p>Ưu tiên <code>expo-image</code> / <code>FastImage</code>, tránh ảnh HD không cần thiết, chọn PNG/WebP thay JPEG để giảm bộ nhớ &amp; thời gian decode.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag perf">State</span> Hạn chế state không cần thiết</h3>
+        <p>Dùng <code>useRef</code> / <code>useSharedValue</code> cho các giá trị không cần re-render UI, giảm số lần component cập nhật.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 SECURITY -->
+  <section id="security">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>Security — Banking &amp; Fintech grade</h2>
+    </div>
+    <p class="section-sub">
+      5 lớp bảo mật áp dụng trong các ứng dụng Banking (MB Bank, LP Bank) &amp; Fintech — từ mã nguồn đến người dùng cuối.
+    </p>
+
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead>
+          <tr><th>Lớp bảo mật</th><th>Giải pháp triển khai</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text)">1. Bảo vệ mã nguồn</strong></td>
+            <td>Hermes, <code>ProGuard</code> / <code>R8</code>, Bitcode, metro-babel obfuscation. Không hardcode API Key.</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">2. Bảo vệ dữ liệu</strong></td>
+            <td>Không dùng AsyncStorage cho dữ liệu nhạy cảm → <code>Keychain</code> / <code>Keystore</code>, <code>react-native-secure-key-store</code>, <code>crypto-js</code></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">3. Bảo vệ giao tiếp mạng</strong></td>
+            <td>HTTPS, SSL Pinning, JWT, OAuth, mã hóa AES/RSA</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">4. Chống reverse engineering</strong></td>
+            <td>Phát hiện root/jailbreak, mock-location (jail-monkey), chống debug/emulator, kiểm tra proxy/VPN</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">5. Bảo vệ người dùng</strong></td>
+            <td>MFA, OTP, Biometric cho giao dịch quan trọng</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid" style="margin-top:24px;">
+      <div class="card reveal">
+        <h3><span class="tag sec">AES</span> Mã hóa đối xứng</h3>
+        <p>Mã hóa payload trước khi gửi server, giải mã ở Back-end bằng cùng secret key — bảo vệ dữ liệu khi truyền tải.</p>
+        <div class="code-panel">
+          <div class="head"><span></span><span></span><span></span> crypto.ts</div>
+          <pre><span class="c3">const</span> encrypted = CryptoJS.<span class="c2">AES</span>.encrypt(
+  JSON.stringify(data), secretKey
+).toString();</pre>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag sec">RSA</span> Mã hóa bất đối xứng</h3>
+        <p>Public Key dùng để mã hóa / xác minh, chỉ Private Key (lưu trong Keychain/Keystore) mới giải mã được — dùng cho chữ ký số &amp; trao đổi dữ liệu nhạy cảm.</p>
+        <ul>
+          <li>Ai cũng biết Public Key, chỉ chủ Private Key giải mã được</li>
+          <li>Chữ ký số ký bằng Private Key để xác thực nguồn gốc &amp; tính toàn vẹn</li>
+        </ul>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag sec">ProGuard</span> Obfuscation cho Android Release</h3>
+        <p><code>minifyEnabled true</code> + <code>shrinkResources true</code> trong <code>build.gradle</code>, kết hợp custom rules trong <code>proguard-rules.pro</code> để bảo vệ class React Native, Hermes, Retrofit/OkHttp.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag sec">JWT</span> Header · Payload · Signature</h3>
+        <p>Header chứa thuật toán mã hóa, Payload chứa claims (quyền, expire time), Signature dùng secret-key trên server để xác thực tính toàn vẹn.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 CORE / ARCHITECTURE -->
+  <section id="core">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Core Concepts &amp; Architecture</h2>
+    </div>
+    <p class="section-sub">
+      Nền tảng JS/TS, mô hình luồng (threading) trong React Native, và tư duy thiết kế hướng SOLID — những gì giúp tối ưu &amp; bảo mật ở trên thực thi đúng cách.
+    </p>
+
+    <div class="grid">
+      <div class="card reveal">
+        <h3><span class="tag core">JS Runtime</span> Event Loop &amp; Microtask / Macrotask</h3>
+        <p>Hiểu rõ thứ tự thực thi <code>Promise.then</code> / <code>queueMicrotask</code> (microtask) trước <code>setTimeout</code> / <code>setInterval</code> (macrotask) — tránh block event loop bằng cách chia nhỏ task nặng.</p>
+        <div class="code-panel">
+          <div class="head"><span></span><span></span><span></span> event-loop.ts</div>
+          <pre>console.log(<span class="c4">"1"</span>);
+setTimeout(() =&gt; console.log(<span class="c4">"2"</span>));
+Promise.resolve().then(() =&gt; console.log(<span class="c4">"3"</span>));
+console.log(<span class="c4">"4"</span>);
+<span class="c1">// ⇒ 1 4 3 2</span></pre>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag core">Threading</span> JS · UI · Native Modules</h3>
+        <p>3 luồng độc lập phối hợp qua React Native Bridge:</p>
+        <ul>
+          <li><strong>JS Thread</strong> — logic, state, render request (Hermes/JSC)</li>
+          <li><strong>UI Thread</strong> — vẽ &amp; cập nhật giao diện native</li>
+          <li><strong>Native Modules Thread</strong> — tác vụ nặng (ảnh, file, mã hóa) chạy background, không chặn UI/JS</li>
+        </ul>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag core">Async</span> Promise.all / allSettled / race / any</h3>
+        <div class="table-wrap" style="margin-top:8px;">
+          <table class="cmp">
+            <thead><tr><th>Method</th><th>Đợi tất cả?</th><th>Trả về</th></tr></thead>
+            <tbody>
+              <tr><td><code>Promise.all</code></td><td>Có, fail-fast</td><td>Mảng kết quả</td></tr>
+              <tr><td><code>Promise.allSettled</code></td><td>Có, không fail</td><td>Mảng status/value/reason</td></tr>
+              <tr><td><code>Promise.race</code></td><td>Không</td><td>Kết quả đầu tiên hoàn thành</td></tr>
+              <tr><td><code>Promise.any</code></td><td>Không</td><td>Kết quả thành công đầu tiên</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag arch">OOP / SOLID</span> Tư duy thiết kế dự án lớn</h3>
+        <p>Áp dụng 4 tính chất OOP (đa hình, kế thừa, đóng gói, trừu tượng) và nguyên tắc SOLID khi thiết kế component &amp; props — dễ mở rộng, dễ maintain ở dự án quy mô 10-30 người.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag arch">Native Bridge</span> iOS &amp; Android Native Modules</h3>
+        <p>Triển khai Native Module giao tiếp 2 chiều qua Promise &amp; Event:</p>
+        <ul>
+          <li><strong>iOS:</strong> <code>RCTBridgeModule</code>, <code>RCT_EXPORT_METHOD</code></li>
+          <li><strong>Android:</strong> extends <code>ReactContextBaseJavaModule</code>, <code>@ReactMethod</code>, đăng ký qua <code>ReactPackage</code></li>
+        </ul>
+      </div>
+
+      <div class="card reveal">
+        <h3><span class="tag arch">Realtime</span> SSE vs WebSocket</h3>
+        <p>SSE (qua <code>EventSource</code>) — kết nối 1 chiều từ server, độ trễ thấp, độ phức tạp thấp hơn Socket. Dùng cho các luồng cập nhật dữ liệu thị trường realtime trong app Fintech.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 APPLIED IN PROJECTS -->
+  <section id="applied">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2>Áp dụng thực tế trong dự án</h2>
+    </div>
+    <p class="section-sub">Những kỹ thuật trên không nằm trên giấy — đây là cách chúng được triển khai trong các dự án đã tham gia.</p>
+
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <div class="tl-date">4/2025 — Hiện tại</div>
+        <div class="tl-content">
+          <h3>Blockchain Apps — Zeroone</h3>
+          <div class="role">Sub-Team Lead · React Native</div>
+          <p>Tối ưu hiệu suất feed (FlashList, memoization) cho luồng tương tác NFT; quản lý nhiều build environment (dev/staging/prod) — áp dụng nguyên tắc tách config rõ ràng.</p>
+          <div class="stack">
+            <span class="stack-chip">FlashList</span>
+            <span class="stack-chip">React.memo</span>
+            <span class="stack-chip">Multi-flavor build</span>
+            <span class="stack-chip">Web3 / Wallet</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-date">6/2024 — 4/2025</div>
+        <div class="tl-content">
+          <h3>Biz Banking App — MB Bank &amp; LP Bank</h3>
+          <div class="role">Mobile Developer (React Native) · Alphaway</div>
+          <p>Cấu hình ProGuard chống decompile, triển khai chữ ký số (RSA), chuyển từ AsyncStorage sang MMKV để tăng hiệu năng và bảo mật lưu trữ. Native module cho QR code &amp; SDK ngân hàng.</p>
+          <div class="stack">
+            <span class="stack-chip">ProGuard / R8</span>
+            <span class="stack-chip">Digital Signature (RSA)</span>
+            <span class="stack-chip">MMKV</span>
+            <span class="stack-chip">Native Module</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-date">12/2022 — 6/2024</div>
+        <div class="tl-content">
+          <h3>Fintech App — US &amp; Singapore Market</h3>
+          <div class="role">Mobile Developer · Equix Technologies</div>
+          <p>Realtime SSE cho dữ liệu thị trường, Reanimated cho animation chạy trên UI Thread, FlashList cho Watchlist, WebView SSO + Biometric cho đăng nhập an toàn, Fastlane tự động build/deploy TestFlight.</p>
+          <div class="stack">
+            <span class="stack-chip">Realtime SSE</span>
+            <span class="stack-chip">Reanimated</span>
+            <span class="stack-chip">Biometric Auth</span>
+            <span class="stack-chip">Fastlane CI/CD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <h2>Sẵn sàng thảo luận chi tiết hơn?<br>Ready to talk in more detail?</h2>
+    <p>
+      Mình luôn cởi mở chia sẻ về cách áp dụng các kỹ thuật performance &amp; security này vào dự án thực tế của bạn.<br>
+      Happy to discuss how these performance &amp; security techniques can be applied to your real-world project.
+    </p>
+    <a class="btn" href="https://nguyenngochai150998-netizen.github.io/my-porfolio/#contact">Liên hệ ngay · <span class="en">Get in touch →</span></a>
+    <div class="copyright">© 2026 Nguyễn Ngọc Hải — React Native Deep Dive</div>
+  </footer>
+
+</div>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.1 });
+  els.forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>

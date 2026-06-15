@@ -280,6 +280,73 @@
     border-color:var(--accent-soft);
     transform:translateY(-2px);
   }
+  .btn-skill{
+  position: relative;
+  overflow: hidden;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 1px solid var(--card-border) !important;
+  background: transparent;
+
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+.btn-skill:hover{
+  transform: translateY(-2px);
+
+  border-color: var(--accent-soft) !important;
+
+  box-shadow:
+    0 12px 30px -12px rgba(167,139,250,.35);
+}
+
+.btn-skill:hover{
+  border-color:var(--accent);
+  box-shadow:0 10px 24px -12px rgba(167,139,250,.45);
+}
+
+.lightning{
+  display:inline-block;
+  color:var(--accent);
+  font-size:1rem;
+  line-height:1;
+
+  animation:electric 2s infinite;
+}
+
+@keyframes electric{
+  0%,100%{
+    transform:translateY(0) scale(1);
+    text-shadow:none;
+  }
+
+  10%{
+    transform:translateY(-1px) scale(1.15);
+    text-shadow:0 0 10px rgba(167,139,250,.8);
+  }
+
+  15%{
+    transform:translateY(1px) scale(.95);
+  }
+
+  20%{
+    transform:translateY(-2px) scale(1.2);
+    text-shadow:
+      0 0 6px rgba(167,139,250,.9),
+      0 0 14px rgba(167,139,250,.6);
+  }
+
+  30%{
+    transform:translateY(0) scale(1);
+    text-shadow:none;
+  }
+}
 /* xxxx */
   @keyframes fadeUp{
     from{opacity:0; transform:translateY(18px);}
@@ -619,6 +686,23 @@
     outline-offset:3px;
   }
 
+  .btn-skill,
+.btn-skill:link,
+.btn-skill:visited{
+  color: #d8ccff; /* tím nhạt hơn */
+}
+
+.btn-skill:hover{
+  color: #ece6ff;
+}
+
+.btn-skill:active{
+  color: #c4b5fd;
+}
+
+.btn-skill:focus-visible{
+  color: #ece6ff;
+}
   @media (prefers-reduced-motion: reduce){
     *{ animation:none !important; transition:none !important; }
   }
@@ -639,13 +723,44 @@
 
 <nav>
   <div class="logo">Ngọc Hải<span>.</span></div>
+
   <ul>
-    <li><a href="#about"><span data-lang="vi">Giới thiệu</span><span data-lang="en">About</span></a></li>
-    <li><a href="#skills"><span data-lang="vi">Kỹ năng</span><span data-lang="en">Skills</span></a></li>
-    <li><a href="#experience"><span data-lang="vi">Kinh nghiệm</span><span data-lang="en">Experience</span></a></li>
-    <li><a href="#education"><span data-lang="vi">Học vấn</span><span data-lang="en">Education</span></a></li>
-    <li><a href="#contact"><span data-lang="vi">Liên hệ</span><span data-lang="en">Contact</span></a></li>
+    <li>
+      <a href="#about">
+        <span data-lang="vi">Giới thiệu</span>
+        <span data-lang="en">About</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#skills">
+        <span data-lang="vi">Kỹ năng</span>
+        <span data-lang="en">Skills</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#experience">
+        <span data-lang="vi">Kinh nghiệm</span>
+        <span data-lang="en">Experience</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#education">
+        <span data-lang="vi">Học vấn</span>
+        <span data-lang="en">Education</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#contact">
+        <span data-lang="vi">Liên hệ</span>
+        <span data-lang="en">Contact</span>
+      </a>
+    </li>
   </ul>
+
   <div class="lang-toggle" role="group" aria-label="Language switch">
     <button type="button" id="btn-vi" class="active">VI</button>
     <button type="button" id="btn-en">EN</button>
@@ -665,14 +780,24 @@
       <span data-lang="vi">5 năm kinh nghiệm phát triển ứng dụng di động với React Native, chuyên sâu trong lĩnh vực Blockchain, Fintech và Banking. Sub-Team Lead cho dự án quốc tế, thành thạo TypeScript, Redux, Expo SDK và tích hợp native module.</span>
       <span data-lang="en">5 years of mobile app development experience with React Native, specializing in Blockchain, Fintech and Banking. Sub-Team Lead on an international client project, proficient in TypeScript, Redux, Expo SDK and native module integration.</span>
     </p>
-    <div class="hero-cta">
-      <a href="#experience" class="btn btn-primary">
-        <span data-lang="vi">Xem dự án</span><span data-lang="en">View projects</span>
-      </a>
-      <a href="#contact" class="btn btn-ghost">
-        <span data-lang="vi">Liên hệ ngay</span><span data-lang="en">Get in touch</span>
-      </a>
-    </div>
+   <div class="hero-cta">
+  <a href="#experience" class="btn btn-primary">
+    <span data-lang="vi">Xem dự án</span>
+    <span data-lang="en">View projects</span>
+  </a>
+
+  <a href="#contact" class="btn btn-ghost">
+    <span data-lang="vi">Liên hệ ngay</span>
+    <span data-lang="en">Get in touch</span>
+  </a>
+
+ <a href="./skills/perfomance.html" class="btn btn-skill">
+  <span class="lightning">⚡</span>
+
+  <span data-lang="vi">Skill Lab</span>
+  <span data-lang="en">Skill Lab</span>
+</a>
+</div>
   </div>
 
   <div class="avatar-stage">
