@@ -291,7 +291,7 @@
     100%{box-shadow:0 0 0 0 rgba(167,139,250,0);}
   }
 
-  /* ===== 3D Avatar ===== */
+  /* ===== Avatar (image) ===== */
   .avatar-stage{
     position:relative;
     display:flex; align-items:center; justify-content:center;
@@ -314,206 +314,21 @@
     50%{transform:scale(1.08); opacity:1;}
   }
 
-  .avatar3d{
+  .avatar-img{
     position:relative;
-    width:300px; height:300px;
+    max-width:340px;
+    width:100%;
+    height:auto;
+    object-fit:contain;
     transform-style:preserve-3d;
     transition:transform .25s ease-out;
     will-change:transform;
     animation:floatY 6s ease-in-out infinite;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,0.5));
   }
   @keyframes floatY{
     0%,100%{ translate: 0 0px; }
     50%{ translate: 0 -16px; }
-  }
-
-  /* Head - Sharp Angular Face */
-  .head{
-    position:absolute; inset:0;
-    border-radius:50% 50% 50% 50% / 55% 55% 45% 45%;
-    background:linear-gradient(130deg, #F4DCC8 0%, #ECC8B0 45%, #DEB59A 100%);
-    box-shadow:
-      inset -32px -26px 75px rgba(80,35,15,0.38),
-      inset 28px 26px 55px rgba(255,255,255,0.48),
-      0 45px 110px -12px rgba(0,0,0,0.6);
-    transform: translateZ(3px);
-  }
-
-  /* Hair - Modern Undercut */
-  .hair-top{
-    position:absolute;
-    top:-38px; left:50%;
-    width:300px; height:130px;
-    transform:translateX(-50%) translateZ(10px);
-    background:linear-gradient(125deg, #1a1115 0%, #2a2220 25%, #1a1115 50%, #0f0b10 100%);
-    border-radius:50% 50% 32% 32% / 80% 80% 20% 20%;
-    box-shadow:
-      inset -20px -12px 45px rgba(0,0,0,0.75),
-      inset 18px 16px 32px rgba(100,90,110,0.12),
-      0 24px 60px rgba(0,0,0,0.5);
-    z-index:3;
-  }
-  .hair-side{
-    position:absolute;
-    width:58px; height:85px;
-    background:linear-gradient(170deg, #1a1115 0%, #0f0b10 70%, #050305 100%);
-    border-radius:42% 58% 48% 42% / 55% 65% 45% 35%;
-    z-index:3;
-    box-shadow: inset -8px -2px 14px rgba(0,0,0,0.6), 0 10px 28px rgba(0,0,0,0.32);
-  }
-  .hair-side-left{ top:32px; left:-16px; transform:translateZ(-3px) rotate(-6deg); }
-  .hair-side-right{ top:32px; right:-16px; transform:translateZ(-3px) rotate(6deg) scaleX(-1); }
-  .hair-spike-1{
-    position:absolute; top:-30px; left:28%; width:18px; height:38px;
-    background:linear-gradient(150deg, #3a2e2a, #1a1115);
-    border-radius:50% 50% 45% 45% / 70% 70% 30% 30%;
-    transform:translateZ(14px) rotate(-18deg);
-    box-shadow:inset -2px -2px 6px rgba(0,0,0,0.65), 0 3px 10px rgba(0,0,0,0.35);
-    z-index:4;
-  }
-  .hair-spike-2{
-    position:absolute; top:-32px; left:45%; width:20px; height:42px;
-    background:linear-gradient(155deg, #3a2e2a, #1a1115);
-    border-radius:50% 50% 44% 44% / 72% 72% 28% 28%;
-    transform:translateX(-50%) translateZ(15px) rotate(-6deg);
-    box-shadow:inset -2px -2px 6px rgba(0,0,0,0.68), 0 4px 11px rgba(0,0,0,0.36);
-    z-index:4;
-  }
-  .hair-spike-3{
-    position:absolute; top:-32px; left:62%; width:20px; height:42px;
-    background:linear-gradient(155deg, #3a2e2a, #1a1115);
-    border-radius:50% 50% 44% 44% / 72% 72% 28% 28%;
-    transform:translateZ(15px) rotate(6deg);
-    box-shadow:inset -2px -2px 6px rgba(0,0,0,0.68), 0 4px 11px rgba(0,0,0,0.36);
-    z-index:4;
-  }
-  .hair-spike-4{
-    position:absolute; top:-30px; right:28%; width:18px; height:38px;
-    background:linear-gradient(150deg, #3a2e2a, #1a1115);
-    border-radius:50% 50% 45% 45% / 70% 70% 30% 30%;
-    transform:translateZ(14px) rotate(18deg);
-    box-shadow:inset -2px -2px 6px rgba(0,0,0,0.65), 0 3px 10px rgba(0,0,0,0.35);
-    z-index:4;
-  }
-  .hair-fringe{
-    position:absolute;
-    top:18px; left:50%;
-    width:240px; height:56px;
-    transform:translateX(-50%) translateZ(22px);
-    background:linear-gradient(170deg, #4a3a32 0%, #2a1f28 45%, #1a1115 100%);
-    border-radius:50% 50% 48% 48% / 78% 78% 42% 42%;
-    z-index:5;
-    box-shadow: inset 0 -8px 18px rgba(60,50,70,0.12), 0 8px 18px rgba(0,0,0,0.3);
-  }
-  .hair-fringe::before, .hair-fringe::after{
-    content:'';
-    position:absolute; bottom:-5px;
-    width:44px; height:34px;
-    background:linear-gradient(170deg, #2a1f28, #1a1115);
-    border-radius:50% 50% 56% 44% / 56% 56% 44% 44%;
-  }
-  .hair-fringe::before{ left:24px; transform:rotate(-12deg); }
-  .hair-fringe::after{ right:24px; transform:rotate(12deg) scaleX(-1); }
-
-  /* Ears - Subtle */
-  .ear{
-    position:absolute; top:120px;
-    width:44px; height:60px;
-    background:linear-gradient(155deg, #f3d8c4 0%, #e6c0a8 100%);
-    border-radius:50% 50% 50% 50% / 64% 64% 36% 36%;
-    box-shadow: inset -12px -12px 20px rgba(85,30,10,0.3), inset 10px 10px 16px rgba(255,255,255,0.45);
-  }
-  .ear-left{ left:-28px; transform:translateZ(-6px) rotate(-4deg); }
-  .ear-right{ right:-28px; transform:translateZ(-6px) rotate(4deg); }
-
-  /* Eyebrows - Sharp, Intense */
-  .brow{
-    position:absolute; top:108px;
-    width:68px; height:13px;
-    background:linear-gradient(95deg, #2a2018 0%, #1a1410 100%);
-    border-radius:50px;
-    z-index:6;
-    box-shadow:0 4px 8px rgba(0,0,0,0.35);
-  }
-  .brow-left{ left:56px; transform:rotate(-5deg) translateZ(11px); }
-  .brow-right{ right:56px; transform:rotate(5deg) translateZ(11px); }
-
-  /* Eyes - Intense, Piercing */
-  .eye{
-    position:absolute; top:126px;
-    width:56px; height:56px;
-    background:#FFFFFF;
-    border-radius:50%;
-    box-shadow:
-      inset 0 1px 4px rgba(0,0,0,0.08),
-      0 5px 15px rgba(0,0,0,0.18);
-    z-index:6;
-    overflow:hidden;
-  }
-  .eye-left{ left:56px; transform:translateZ(14px); }
-  .eye-right{ right:56px; transform:translateZ(14px); }
-  .pupil{
-    position:absolute; width:26px; height:26px; border-radius:50%;
-    background:#3a2e28;
-    top:15px; left:15px;
-    transition:transform .15s ease-out;
-    box-shadow:inset -3px -3px 6px rgba(0,0,0,0.45);
-  }
-  .pupil::after{
-    content:'';
-    position:absolute; width:10px; height:10px; border-radius:50%;
-    background:#fff; opacity:.94;
-    top:5px; left:6px;
-    box-shadow:0 1px 2px rgba(0,0,0,0.15);
-  }
-
-  /* Nose - Sharp */
-  .nose{
-    position:absolute; top:166px; left:50%;
-    width:33px; height:30px;
-    transform:translateX(-50%) translateZ(24px);
-    background:linear-gradient(165deg, #f0e2d8, #e4cdb8);
-    border-radius:50% 50% 55% 55% / 50% 50% 68% 68%;
-    box-shadow: inset -5px -3px 10px rgba(70,30,10,0.3), 0 4px 10px rgba(0,0,0,0.14);
-    z-index:5;
-  }
-
-  /* Mouth - Subtle, Cool */
-  .mouth{
-    position:absolute; top:214px; left:50%;
-    width:110px; height:28px;
-    transform:translateX(-50%) translateZ(18px);
-    background:linear-gradient(175deg, #fce8de 0%, #f6d2c2 100%);
-    border-radius:0 0 52% 52% / 0 0 68% 68%;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08), 0 5px 12px rgba(0,0,0,0.16);
-    z-index:5;
-  }
-  .mouth::after{
-    content:'';
-    position:absolute; left:16px; right:16px; top:50%;
-    height:1px; background:rgba(0,0,0,0.15);
-  }
-  /* Cheeks - Minimal Flush */
-  .cheek{
-    position:absolute; top:148px;
-    width:36px; height:26px;
-    border-radius:50%;
-    background:radial-gradient(circle at 38% 50%, rgba(235,125,150,0.22), rgba(235,125,150,0.05) 70%, transparent 85%);
-    z-index:3;
-    filter:blur(0.8px);
-  }
-  .cheek-left{ left:42px; }
-  .cheek-right{ right:42px; }
-
-  /* Shoulders */
-  .shoulders{
-    position:absolute; bottom:-100px; left:50%;
-    width:400px; height:160px;
-    transform:translateX(-50%) translateZ(-30px);
-    background:linear-gradient(160deg, #2E2747 0%, #1C1730 100%);
-    border-radius:50% 50% 0 0 / 80% 80% 0 0;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
-    z-index:1;
   }
 
   /* Floating chips around avatar */
@@ -865,28 +680,7 @@
     <div class="chip chip-1">React Native</div>
     <div class="chip chip-2">TypeScript</div>
     <div class="chip chip-3">Blockchain</div>
-    <div class="avatar3d" id="avatar3d">
-      <div class="shoulders"></div>
-      <div class="ear ear-left"></div>
-      <div class="ear ear-right"></div>
-      <div class="head"></div>
-      <div class="hair-side hair-side-left"></div>
-      <div class="hair-side hair-side-right"></div>
-      <div class="hair-top"></div>
-      <div class="hair-fringe"></div>
-      <div class="hair-spike-1"></div>
-      <div class="hair-spike-2"></div>
-      <div class="hair-spike-3"></div>
-      <div class="hair-spike-4"></div>
-      <div class="brow brow-left"></div>
-      <div class="brow brow-right"></div>
-      <div class="cheek cheek-left"></div>
-      <div class="cheek cheek-right"></div>
-      <div class="eye eye-left"><div class="pupil" data-pupil></div></div>
-      <div class="eye eye-right"><div class="pupil" data-pupil></div></div>
-      <div class="nose"></div>
-      <div class="mouth"></div>
-    </div>
+    <img class="avatar-img" id="avatar3d" src="./asset/avatar.png" alt="Nguyễn Ngọc Hải avatar" />
   </div>
 </section>
 
@@ -1300,11 +1094,10 @@
   });
 
   // =========================
-  // AVATAR 3D
+  // AVATAR TILT (image)
   // =========================
   const stage = document.querySelector('.avatar-stage');
   const avatar = document.getElementById('avatar3d');
-  const pupils = document.querySelectorAll('[data-pupil]');
 
   if (
     stage &&
@@ -1324,12 +1117,7 @@
       const clampedY = Math.max(-1, Math.min(1, dy));
 
       avatar.style.transform =
-        `rotateY(${clampedX * 18}deg) rotateX(${-clampedY * 14}deg)`;
-
-      pupils.forEach((p) => {
-        p.style.transform =
-          `translate(${clampedX * 6}px, ${clampedY * 6}px)`;
-      });
+        `rotateY(${clampedX * 12}deg) rotateX(${-clampedY * 8}deg)`;
     });
   }
 
